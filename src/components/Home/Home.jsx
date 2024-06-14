@@ -18,34 +18,6 @@ function Home() {
 
     const [selectedDepartment, setSelectedDepartment] = useState('');
 
-    // sorting
-
-    const handleSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-
-        const sortedData = [...viewemployee].sort((a, b) => {
-            if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1;
-            if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1;
-            return 0;
-        });
-
-        setSortConfig({ key, direction });
-        setViewemployee(sortedData);
-
-    };
-
-    const getSortIcon = (key) => {
-        if (sortConfig.key !== key) {
-            return <i className="bi bi-arrow-down-up sort-icon"></i>;
-        }
-        if (sortConfig.direction === 'ascending') {
-            return <i className="bi bi-arrow-up sort-icon"></i>;
-        }
-        return <i className="bi bi-arrow-down sort-icon"></i>;
-    };
 
     const handleEdit = (id) => {
         console.log('====================================');
@@ -65,7 +37,7 @@ function Home() {
     // search
     const handleSearch = (e) => {
         setSearch(e.target.value);
-        const data = getData('product');
+        const data = getData('employee');
         const searchData = data.filter(item =>
             item.empName.toLowerCase().includes(e.target.value.toLowerCase())
         );
@@ -74,35 +46,36 @@ function Home() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const data = getData('product');
+        const data = getData('employee');
         const searchData = data.filter(item =>
             item.empName.toLowerCase().includes(search.toLowerCase())
         );
         setViewemployee(searchData);
     }
+    //filtering
 
     const handleDepartmentChange = (e) => {
-        setSelectedDepartment(e.target.value);
-        const filteredEmployees = selectedDepartment 
-            ? getData('employee').filter(emp => emp.empDepartment === e.target.value)
-            : getData('employee');
+        const department = e.target.value;
+        setSelectedDepartment(department);  
+
+        // Get all employees and filter based on selected department
+        const employees = getData('employee');
+        const filteredEmployees = department ? employees.filter(emp => emp.empDepartment === department) : [...employees];
+
+        console.log('Filtered Employees:', filteredEmployees);
         setViewemployee(filteredEmployees);
     };
 
-    const departments = Array.from(new Set(viewemployee.map(emp => emp.empDepartment)));
+    const departments = [...new Set(getData('employee').map(emp => emp.empDepartment))];
     return (
         <>
             <Container className='p-3'>
                 <div className='p-2 d-flex head  text-light justify-content-between '>
                     <h4 className='p-1 m-0'>Employee Table</h4>
-                    <select
-                        className='form-select '
-                        value={selectedDepartment}
-                        onChange={handleDepartmentChange}
-                    >
-                        <option value="">All Departments</option>
-                        {departments.map(department => (
-                            <option key={department} value={department}>{department}</option>
+                    <select onChange={handleDepartmentChange} value={selectedDepartment}>
+                        <option value="">Select Department</option>
+                        {departments.map(dept => (
+                            <option key={dept} value={dept}>{dept}</option>
                         ))}
                     </select>
                     <div className='d-flex'>
@@ -121,29 +94,21 @@ function Home() {
                             <i className="bi bi-search"></i>
                         </button>
                     </div>
-                    
+
                 </div>
 
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            {/* <th>Employee Id </th>
+                            <th>Employee Id </th>
                             <th>Employee Name </th>
                             <th>Employee Age </th>
                             <th>Employee Department </th>
                             <th>Employee Position </th>
                             <th>Employee Salary </th>
                             <th>Employee Email </th>
-                            <th>Action</th> */}
-
-                            <th onClick={() => handleSort('id')}>Employee Id {getSortIcon('id')}</th>
-                            <th onClick={() => handleSort('empName')}>Employee Name {getSortIcon('empName')}</th>
-                            <th onClick={() => handleSort('empAge')}>Employee Age {getSortIcon('empAge')}</th>
-                            <th onClick={() => handleSort('empDepartmen')}>Employee Department {getSortIcon('empDepartmen')}</th>
-                            <th onClick={() => handleSort('empPosition')}>Employee Position {getSortIcon('empPosition')}</th>
-                            <th onClick={() => handleSort('empSalary')}>Employee Salary {getSortIcon('empSalary')}</th>
-                            <th onClick={() => handleSort('empEmail')}>Employee Email {getSortIcon('empEmail')}</th>
                             <th>Action</th>
+
 
                         </tr>
                     </thead>

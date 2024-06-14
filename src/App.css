@@ -216,5 +216,8 @@ nav .button{
   color: rgb(85, 50, 118);
 }
 
-
+select{
+  padding: 0px;
+  height: 50px;
+}
 
